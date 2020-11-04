@@ -40,12 +40,11 @@ function NonAMarsh(dM,M,p,t)
 
     #trapping EQN
     # at 0 biomass, 0 efficiency
-    # at 4000 biomass, 0 efficiency
-    # at 2000 biomass, 100% efficiency
-    pp1 = 1000
-    pp2 = 4000000
-    #pp1 = 750
-    #pp2 = 225000
+    # at 1000 biomass, 100% efficiency
+    # at 2000 biomass, 0 efficiency
+
+    pp1 = 500
+    pp2 = 1000000
 
     TE = (Bt/pp1) - ((Bt*Bt)/pp2)
     #no blocking trapping term
@@ -59,12 +58,12 @@ end
 
 #parameters (SLR, r)
 #SLR is Charleston,SC is 3.32 mm/yr or 0.0032
-p = (0.006, 0.1)
+p = (0.003, 0.1)
 #ICs (biomass, depth)
-M0 = [100, .2]
+M0 = [100, 0.6]
 
 #time span
-tspan = (0.0,100.0)
+tspan = (0.0,1000.0)
 prob = ODEProblem(NonAMarsh,M0,tspan,p)
 sol = solve(prob)
 
