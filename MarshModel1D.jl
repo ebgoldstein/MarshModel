@@ -21,15 +21,17 @@ function NonAMarsh(dM,M,p,t)
 
     ########################################################
     #Biomass based on Morris et al 2002
-    B = (a*M[1]) + (b*M[1]*M[1]) + (c)
+    Biomass = (a*M[1]) + (b*M[1]*M[1]) + (c)
 
+    #make sure to allow only positive biomass
+    Biomass < 0 ? B = 0 : B = Biomass
     ########################################################
 
     #BIOMASS EQN — — time varying biomass to use for depth eqn 
     #biomass varies between 1 and 0.5
-    Bt = M[1] * ((0.25)*sin(2*π*t)+0.75)
+    #Bt = B * ((0.25)*sin(2*π*t)+0.75)
     #biomass varies between 1 and 0
-    #Bt = B * ((0.5)*sin(2*π*t)+0.5)
+    Bt = B * ((0.5)*sin(2*π*t)+0.5)
     #biomass is constant
     #Bt = M[1]
 
@@ -43,24 +45,32 @@ function NonAMarsh(dM,M,p,t)
     pp1 = 500
     pp2 = 1000000
 
-    TE = (Bt/pp1) - ((Bt*Bt)/pp2)
+    Trapping = (Bt/pp1) - ((Bt*Bt)/pp2)
+    #make sure to allow only positive trapping
+    Trapping < 0 ? TE = 0 : TE = Trapping
+
     #no blocking trapping term
     #TE = 1
 
     #marsh platform depth EQN w/ SLR
-    dM[1] = SL - (q+(TE*k*Bt))*M[1]
+    d = (q+(TE*k*Bt))*M[1]
+
+    #make sure to allow only deposition, not erosion
+    d < 0 ? dep = 0 : dep = d
+
+    dM[1] = SL - dep
     ########################################################
 
 end
 
 #parameters (SLR)
 #SLR is Charleston,SC is 3.32 mm/yr or 0.0032
-p = (0.003)
+p = (0.002)
 #ICs (initial depth)
 M0 = [0.4]
 
 #time span
-tspan = (0.0,1000.0)
+tspan = (0.0,2000.0)
 prob = ODEProblem(NonAMarsh,M0,tspan,p)
 sol = solve(prob)
 
