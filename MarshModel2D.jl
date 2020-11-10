@@ -22,6 +22,8 @@ function NonAMarsh(dM,M,p,t)
     ########################################################
     #carrying capacity based on Morris et al 2002
     κ = (a*M[2]) + (b*M[2]*M[2]) + (c)
+    #make sure to allow only positive κ
+    κ < 0 ? κ = 0 : κ = κ
 
     #plant biomass EQN
     dM[1] = r*M[1]*(1.0 - (M[1]/κ))
@@ -49,9 +51,15 @@ function NonAMarsh(dM,M,p,t)
     TE = (Bt/pp1) - ((Bt*Bt)/pp2)
     #no blocking trapping term
     #TE = 1
+    #make sure to allow only positive trapping
+    TE < 0 ? TE = 0 : TE = TE
+
+    dep = (q+(TE*k*Bt))*M[2]
+    #make sure to allow only deposition, not erosion
+    dep < 0 ? dep = 0 : dep = dep
 
     #marsh platform depth EQN w/ SLR
-    dM[2] = SL - (q+(TE*k*Bt))*M[2]
+    dM[2] = SL - dep
     ########################################################
 
 end
@@ -60,10 +68,10 @@ end
 #SLR is Charleston,SC is 3.32 mm/yr or 0.0032
 p = (0.003, 0.1)
 #ICs (biomass, depth)
-M0 = [100, 0.6]
+M0 = [100, 0.4]
 
 #time span
-tspan = (0.0,1000.0)
+tspan = (0.0,400.0)
 prob = ODEProblem(NonAMarsh,M0,tspan,p)
 sol = solve(prob)
 
